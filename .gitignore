@@ -1,6 +1,7 @@
 # language model file
 *.model
 *.model.syn1neg.npy
+*.model.wv.vectors.npy
 
 
 # Byte-compiled / optimized / DLL files
