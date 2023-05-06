@@ -1,3 +1,8 @@
+# language model file
+*.model
+*.model.syn1neg.npy
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
