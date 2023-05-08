@@ -1,13 +1,14 @@
 # Age Bias in People's Daily
 
-This repository contains Python scripts for analyzing word embeddings for age bias in text data. It computes cosine similarities and embedding bias between target words and foundational words and includes visualizations of the results.
+This repository contains Python scripts for analyzing word embeddings for age bias in text data. It computes cosine similarities and embedding bias between target words and evaluative words and includes visualizations of the results.
 
 ## How to use
 To run the project, follow these steps:
 
 1. Make sure you have the necessary dependencies installed (pandas, gensim, numpy and others mentioned in the import section of each file).
-2. Run main.py to compute cosine similarities using word2vec models and save the results as a CSV file.
-3. Adjust the target words, foundational words and word2vec models as needed and re-run main.py to update the results based on your specific requirements.
+2. Download trained Word2Vec models from OSF resipotory (upon request) and place all files under `0_data/model` folder.
+3. Run main.py to compute cosine similarities using word2vec models and save the results as a CSV file.
+4. Adjust the target words, foundational words and word2vec models as needed and re-run main.py to update the results based on your specific requirements.
 
 Additionally, you may also run other analysis scripts, such as extract_cosine_similarities.py, calculate_embedding_bias.py, and PeopleDaily_GrangerTest.py to perform relevant data analysis tasks.
 
