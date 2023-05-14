@@ -32,4 +32,5 @@ The project folder is organized into several sub-folders to facilitate clear and
 ### Additional Principles
 - Load data only from 0_data or out folders in 2_pipeline. 
 - Load data only from out folders belonging to code files that are executed before the current code file.
-- Set the working directory to the top-level project folder to use relative paths.
+- Set the working directory to the top-level project folder to use relative path.
+- Checkout the [collaboration tips](https://github.com/amberxuqianchen/lab-general/blob/main/Git/git_collaboration_tips.md).
