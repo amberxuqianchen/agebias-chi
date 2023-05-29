@@ -83,6 +83,13 @@ def granger_test(df, dvs, ivs, maxlagnum=10):
 iv_predict_dv = granger_test(df,dvs,ivs,10)
 dv_predict_iv = granger_test(df,ivs,dvs,10)
 
+# make sure the output folder exists
+if not os.path.exists(output_folder_path):
+    os.makedirs(output_folder_path)
+
+# make the result dataframe limited to 2 digits after the decimal point
+iv_predict_dv = iv_predict_dv.round(2)
+dv_predict_iv = dv_predict_iv.round(2)
 
 iv_predict_dv.to_csv(os.path.join(output_folder_path,'iv_predict_dv_simple.csv'))
 dv_predict_iv.to_csv(os.path.join(output_folder_path,'dv_predict_iv_simple.csv'))
