@@ -10,7 +10,7 @@ data_folder_path = os.path.join(script_dir, '..', '0_data')
 pipeline_folder_path = os.path.join(script_dir, '..', '2_pipeline/preprocessed')
 pipeline_out_folder_path = os.path.join(script_dir, '..', '2_pipeline/out')
 tmp_folder_path = os.path.join(script_dir, '..', '2_pipeline/tmp')
-output_folder_path = os.path.join(script_dir, '..', '3_output/results')
+output_folder_path = os.path.join(script_dir, '..', '3_output/results/granger')
 df = pd.read_csv(os.path.join(pipeline_out_folder_path, 'merged.csv'))
 
 df['positive'] = df['old_positive'] - df['young_positive']
