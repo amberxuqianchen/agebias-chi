@@ -1,7 +1,9 @@
+
+# set up working directory in the project folder
 setwd("/home/local/PSYCH-ADS/xuqian_chen/Github/agebias-chi")
+
 datafolder <- "./2_pipeline/out"
 outputfolder <- "./3_output/figures"
-
 library("bcp")
 library("ggplot2")
 library("dplyr")
@@ -40,6 +42,10 @@ ggplot()+
   annotate("text",x = positive_year_prob[1:3,1],y = positive_year_prob[1:3,3],label = positive_year_prob[1:3,1],size = 3)+
   annotate("text",x = negative_year_prob[1:3,1],y = negative_year_prob[1:3,3],label = negative_year_prob[1:3,1],size = 3)+
   labs(title = "Positive and Negative Attitudes (Old - Young)",x = "Year",y = "Posterior Means",color = "Attitude",caption = "Annotations indicate the top 3 years with the highest posterior probability")
+# display plot
+
+plot(cars)
+
 # save plot
 ggsave(file.path(outputfolder,"bcp_attitudes.png"),width = 6,height = 4)
 

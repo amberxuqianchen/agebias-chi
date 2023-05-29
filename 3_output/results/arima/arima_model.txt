@@ -1,0 +1,53 @@
+
+======================================================================
+                                model_name          aic    lag  stats 
+----------------------------------------------------------------------
+indi-> positive              indi-> positive      -219.177  0   4.677 
+coll-> positive              coll-> positive      -227.342  0  270.442
+indicoll-> positive        indicoll-> positive    -219.029  0   0.431 
+tight-> positive             tight-> positive     -237.940  0  130.119
+loose-> positive             loose-> positive     -235.126  0  48.097 
+tightloose-> positive     tightloose-> positive   -224.937  0  -33.892
+indi-> negative              indi-> negative      -222.955  0  19.437 
+coll-> negative              coll-> negative      -221.306  0  -2.245 
+indicoll-> negative        indicoll-> negative    -222.815  0  17.602 
+tight-> negative             tight-> negative     -206.148  0         
+loose-> negative             loose-> negative     -221.633  0   9.491 
+tightloose-> negative     tightloose-> negative   -221.404  0  -5.682 
+indi-> competent             indi-> competent     -226.987  0   0.287 
+coll-> competent             coll-> competent     -222.693  0   0.411 
+indicoll-> competent       indicoll-> competent   -227.117  0   0.280 
+tight-> competent           tight-> competent     -220.467  0   0.345 
+loose-> competent           loose-> competent     -223.048  0   0.453 
+tightloose-> competent    tightloose-> competent  -239.324  0  -0.289 
+indi-> warm                    indi-> warm        -232.058  0   0.407 
+coll-> warm                    coll-> warm        -229.983  0   0.779 
+indicoll-> warm              indicoll-> warm      -231.375  0  22.651 
+tight-> warm                   tight-> warm       -232.682  0  80.124 
+loose-> warm                   loose-> warm       -239.355  0  63.281 
+tightloose-> warm           tightloose-> warm     -234.624  0  -52.504
+indi-> incompetent          indi-> incompetent    -218.555  0   0.178 
+coll-> incompetent          coll-> incompetent    -221.710  0   0.342 
+indicoll-> incompetent    indicoll-> incompetent  -218.933  0   0.187 
+tight-> incompetent        tight-> incompetent    -222.159  0   0.335 
+loose-> incompetent        loose-> incompetent    -209.311  0         
+tightloose-> incompetent tightloose-> incompetent -219.727  0   6.704 
+indi-> cold                    indi-> cold        -236.644  0  54.777 
+coll-> cold                    coll-> cold        -181.091  0         
+indicoll-> cold              indicoll-> cold      -235.226  0  47.405 
+tight-> cold                   tight-> cold       -180.981  0         
+loose-> cold                   loose-> cold       -206.894  0         
+tightloose-> cold           tightloose-> cold     -216.584  0         
+indi-> virtue                 indi-> virtue       -269.598  0  -0.149 
+coll-> virtue                 coll-> virtue       -268.167  0  -0.197 
+indicoll-> virtue           indicoll-> virtue     -226.792  0         
+tight-> virtue                tight-> virtue      -218.925  0         
+loose-> virtue                loose-> virtue      -277.043  0  51.611 
+tightloose-> virtue        tightloose-> virtue    -273.296  0  -44.443
+indi-> vice                    indi-> vice        -237.694  0   0.012 
+coll-> vice                    coll-> vice        -174.639  0         
+indicoll-> vice              indicoll-> vice      -236.340  0   0.055 
+tight-> vice                   tight-> vice       -177.370  0         
+loose-> vice                   loose-> vice       -241.742  0  63.339 
+tightloose-> vice           tightloose-> vice     -239.049  0  -65.830
+----------------------------------------------------------------------
