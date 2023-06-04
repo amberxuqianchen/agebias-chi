@@ -1,0 +1,6 @@
+,Direction,Lag,F-statistic_iv2dv,p-value_iv2dv,AIC_iv2dv,F-statistic_dv2iv,p-value_dv2iv,AIC_dv2iv
+0,competent -> tight,10,3.18,0.0,-26.59,1.46,0.19,-26.59
+1,positive -> indicoll,3,3.04,0.04,-26.96,1.95,0.13,-26.96
+2,positive -> tight,9,2.13,0.05,-26.65,1.72,0.11,-26.65
+3,virtue -> indicoll,3,4.27,0.01,-27.08,0.98,0.41,-27.08
+4,warm -> indicoll,3,4.22,0.01,-26.54,0.43,0.73,-26.54

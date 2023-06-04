@@ -98,3 +98,35 @@ dv_predict_iv_all.to_csv(os.path.join(output_folder_path,'dv_predict_iv_simple_a
 
 iv_predict_dv_sig.to_csv(os.path.join(output_folder_path,'iv_predict_dv_simple_sig.csv'))
 dv_predict_iv_sig.to_csv(os.path.join(output_folder_path,'dv_predict_iv_simple_sig.csv'))
+
+# Define a function to reverse direction
+def reverse_direction(direction):
+    terms = direction.split(' -> ')
+    return f'{terms[1]} -> {terms[0]}'
+
+# Apply this function to 'Direction' column of the second DataFrame
+dv_predict_iv_all['Direction'] = dv_predict_iv_all['Direction'].apply(reverse_direction)
+
+# Set multi-index for both dataframes based on 'Direction' and 'Lag'
+iv_predict_dv_sig.set_index(['Direction', 'Lag'], inplace=True)
+dv_predict_iv_all.set_index(['Direction', 'Lag'], inplace=True)
+
+# Join iv_predict_dv_sig and dv_predict_iv_all horizontally based on the index
+merged_df = iv_predict_dv_sig.join(dv_predict_iv_all, lsuffix='_iv2dv', rsuffix='_dv2iv')
+
+# Reset the index so that 'Direction' and 'Lag' become regular columns again
+merged_df.reset_index(inplace=True)
+merged_df.to_csv(os.path.join(output_folder_path,'culture_matched.csv'))
+
+iv_predict_dv_all['Direction'] = iv_predict_dv_all['Direction'].apply(reverse_direction)
+
+# Set multi-index for both dataframes based on 'Direction' and 'Lag'
+dv_predict_iv_sig.set_index(['Direction', 'Lag'], inplace=True)
+iv_predict_dv_all.set_index(['Direction', 'Lag'], inplace=True)
+
+# Join iv_predict_dv_sig and dv_predict_iv_all horizontally based on the index
+merged_df = dv_predict_iv_sig.join(iv_predict_dv_all, lsuffix='_iv2dv', rsuffix='_dv2iv')
+
+# Reset the index so that 'Direction' and 'Lag' become regular columns again
+merged_df.reset_index(inplace=True)
+merged_df.to_csv(os.path.join(output_folder_path,'agebias_matched.csv'))
