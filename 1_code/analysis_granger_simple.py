@@ -78,18 +78,23 @@ def granger_test(df, dvs, ivs, maxlagnum=10):
     results_df = results_df.loc[results_df.groupby("Direction")["AIC"].idxmin()]
     # Filter DataFrame to only include significant results
     significant_results_df = results_df[results_df['p-value'] < 0.05]
-    return significant_results_df
+    return results_df,significant_results_df
 
-iv_predict_dv = granger_test(df,dvs,ivs,10)
-dv_predict_iv = granger_test(df,ivs,dvs,10)
+iv_predict_dv_all,iv_predict_dv_sig = granger_test(df,dvs,ivs,10)
+dv_predict_iv_all,dv_predict_iv_sig = granger_test(df,ivs,dvs,10)
 
 # make sure the output folder exists
 if not os.path.exists(output_folder_path):
     os.makedirs(output_folder_path)
 
 # make the result dataframe limited to 2 digits after the decimal point
-iv_predict_dv = iv_predict_dv.round(2)
-dv_predict_iv = dv_predict_iv.round(2)
+iv_predict_dv_all = iv_predict_dv_all.round(2)
+iv_predict_dv_sig = iv_predict_dv_sig.round(2)
+dv_predict_iv_all = dv_predict_iv_all.round(2)
+dv_predict_iv_sig = dv_predict_iv_sig.round(2)
 
-iv_predict_dv.to_csv(os.path.join(output_folder_path,'iv_predict_dv_simple.csv'))
-dv_predict_iv.to_csv(os.path.join(output_folder_path,'dv_predict_iv_simple.csv'))
+iv_predict_dv_all.to_csv(os.path.join(output_folder_path,'iv_predict_dv_simple_all.csv'))
+dv_predict_iv_all.to_csv(os.path.join(output_folder_path,'dv_predict_iv_simple_all.csv'))
+
+iv_predict_dv_sig.to_csv(os.path.join(output_folder_path,'iv_predict_dv_simple_sig.csv'))
+dv_predict_iv_sig.to_csv(os.path.join(output_folder_path,'dv_predict_iv_simple_sig.csv'))
