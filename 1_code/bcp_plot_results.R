@@ -4,6 +4,7 @@ setwd("/home/local/PSYCH-ADS/xuqian_chen/Github/agebias-chi")
 
 datafolder <- "./2_pipeline/out"
 outputfolder <- "./3_output/figures"
+outputresult <- "./3_output/results/bcp"
 library("bcp")
 library("ggplot2")
 library("dplyr")
@@ -28,13 +29,13 @@ fit = bcp(dfage$positive)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 positive_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
-
+write.csv(positive_year_prob,file.path(outputresult,"positive_year_prob.csv"))
 # plot negative attitude
 fit = bcp(dfage$negative)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 negative_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
-
+write.csv(negative_year_prob,file.path(outputresult,"negative_year_prob.csv"))
 # plot both positive and negative attitude
 ggplot()+
   geom_line(data = positive_year_prob,aes(Year,Means,color = "Positive"))+
@@ -57,13 +58,14 @@ fit = bcp(dfage$competent)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 competent_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
+write.csv(competent_year_prob,file.path(outputresult,"competent_year_prob.csv"))
 
 # plot warm
 fit = bcp(dfage$warm)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 warm_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
-
+write.csv(warm_year_prob,file.path(outputresult,"warm_year_prob.csv"))
 # plot both competent and warm
 ggplot()+
   geom_line(data = competent_year_prob,aes(Year,Means,color = "Competent"))+
@@ -83,13 +85,14 @@ fit = bcp(dfage$incompetent)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 incompetent_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
+write.csv(incompetent_year_prob,file.path(outputresult,"incompetent_year_prob.csv"))
 
 # plot cold
 fit = bcp(dfage$cold)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 cold_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
-
+write.csv(cold_year_prob,file.path(outputresult,"unwarm_year_prob.csv"))
 # plot both incompetent and cold
 ggplot()+
   geom_line(data = incompetent_year_prob,aes(Year,Means,color = "Incompetent"))+
@@ -109,13 +112,13 @@ fit = bcp(dfage$virtue)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 virtue_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
-
+write.csv(virtue_year_prob,file.path(outputresult,"virtue_year_prob.csv"))
 # plot vice
 fit = bcp(dfage$vice)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 vice_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
-
+write.csv(vice_year_prob,file.path(outputresult,"vice_year_prob.csv"))
 # plot both virtue and vice
 ggplot()+
   geom_line(data = virtue_year_prob,aes(Year,Means,color = "Virtue"))+
