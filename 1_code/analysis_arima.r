@@ -50,6 +50,7 @@ ivs <- c("indi","coll")
 
 granger_list <- list()
 granger_lags <- list()
+model_list_GDP <- list()
 model_list <- list()
 select_lags<-function(x_var,y_var,max.lag=10) {
     # Create time series objects for each variable
@@ -109,7 +110,7 @@ for (i in 1:length(dvs)){
       stargazer(model, summary=FALSE, type="text", out=file.path(outputfolder, paste(dvs[i], ivs[j], sep = "_") %>% paste0("_GDP_arima.txt")), notes=model_name)
 
       # stargazer(model,summary = FALSE, type = "text", out = file.path(outputfolder,paste(dvs[i],ivs[j],sep = "_") %>% paste0("_arima.txt")))
-      model_list[[paste(ivs[j],dvs[i],sep = "->")]] <- model
+      model_list_GDP[[paste(ivs[j],dvs[i],sep = "->")]] <- model
       
       # run ARIMA without GDPpc as controlling variable
       xreg <- dfage[,ivs[j]]
@@ -124,8 +125,8 @@ for (i in 1:length(dvs)){
 
       # save the model
       model_name <- paste(dvs[i], " (", ar, ",", diff, ",", ma, ")", sep="")
-      stargazer(model, summary=FALSE, type="text", out=file.path(outputfolder, paste(dvs[i], ivs[j], sep = "_") %>% paste0("_arima.txt")), notes=model_name)
-
+      # stargazer(model, summary=FALSE, type="text", out=file.path(outputfolder, paste(dvs[i], ivs[j], sep = "_") %>% paste0("_arima.txt")), notes=model_name)
+      model_list[[paste(ivs[j],dvs[i],sep = "->")]] <- model
       # from threat paper: run granger causality test with removed the time dependencies from each individual series using the previous ARIMA procedure
 
       # run granger causality test on the residuals, loop through lags of 1 to 10 and select the best lag based on AIC
@@ -133,7 +134,7 @@ for (i in 1:length(dvs)){
 
       # there are aliased (perfectly correlated or duplicate) coefficients between indi and negative
       try({
-        granger_model <- grangertest(dfage[,ivs[j]]~dfage[,dvs[i]],order = diff)
+        granger_model <- grangertest(dfage[,dvs[j]]~dfage[,ivs[i]],order = ar)
         granger_list[[paste(ivs[j],dvs[i],sep = "->")]] <- round(granger_model$`Pr(>F)`[2],digits = 2)
       }, silent=TRUE)
       # bestlag_r <- select_lags(dfage[,ivs[j]],dfage[,dvs[i]])
@@ -146,19 +147,19 @@ for (i in 1:length(dvs)){
 }
 
 # organize the granger causality test results
-granger_df <- data.frame(model_name = names(granger_list),pvalue = unlist(lapply(granger_list,function(x) x$"Pr(>F)"[2])))
-granger_df <- data.frame(model_name = names(granger_list),
-                         pvalue = unlist(lapply(granger_list, function(x) {
-                           if (is.list(x) || is.data.frame(x)) {
-                             if("Pr(>F)" %in% names(x)) {
-                               return(x[["Pr(>F)"]][2])
-                             } else {
-                               return("the first NA")  # or other default value
-                             }
-                           } else {
-                             return("the second NA")  # or other default value
-                           }
-                         })))
+# granger_df <- data.frame(model_name = names(granger_list),pvalue = unlist(lapply(granger_list,function(x) x$"Pr(>F)"[2])))
+# granger_df <- data.frame(model_name = names(granger_list),
+#                          pvalue = unlist(lapply(granger_list, function(x) {
+#                            if (is.list(x) || is.data.frame(x)) {
+#                              if("Pr(>F)" %in% names(x)) {
+#                                return(x[["Pr(>F)"]][2])
+#                              } else {
+#                                return("the first NA")  # or other default value
+#                              }
+#                            } else {
+#                              return("the second NA")  # or other default value
+#                            }
+#                          })))
 
 # organize the ARIMA model results, including essential stats, lagged years, AIC
 model_df <- data.frame(model_name = names(model_list),aic = unlist(lapply(model_list,function(x) x$aic)),lag = unlist(lapply(model_list,function(x) x$arma[4])),stats = unlist(lapply(model_list,function(x) x$coef[3])))
@@ -167,5 +168,6 @@ model_df$IV <- sapply(strsplit(as.character(model_df$model_name), "->"), "[", 2)
 
 # save
 stargazer(model_list,summary = FALSE, type = "text", out = file.path(outputfolder,"arima_model.txt"))
+stargazer(model_list_GDP,summary = FALSE, type = "text", out = file.path(outputfolder,"arima_model_GDP.txt"))
 print("finish arima_model.txt")
 stargazer(model_df,summary = FALSE, type = "text", out = file.path(outputfolder,"arima_summary.txt"))

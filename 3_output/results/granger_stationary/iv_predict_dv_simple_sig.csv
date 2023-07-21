@@ -1,0 +1,3 @@
+,Direction,Lag,F-statistic,p-value,AIC
+347,loose -> unwarm,8,4.24,0.0,-26.59
+402,loose -> virtue,3,4.48,0.01,-27.07

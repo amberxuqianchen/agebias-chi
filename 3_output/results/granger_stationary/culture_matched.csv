@@ -1,0 +1,3 @@
+,Direction,Lag,F-statistic_iv2dv,p-value_iv2dv,AIC_iv2dv,F-statistic_dv2iv,p-value_dv2iv,AIC_dv2iv
+0,loose -> unwarm,8,4.24,0.0,-26.59,1.7,0.12,-26.59
+1,loose -> virtue,3,4.48,0.01,-27.07,0.97,0.41,-27.07

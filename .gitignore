@@ -6,7 +6,6 @@
 # test files
 test_function.Rmd
 test_function.ipynb
-analysis_arima.r
 
 # Created by https://www.toptal.com/developers/gitignore/api/r,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=r,python

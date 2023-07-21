@@ -1,0 +1,21 @@
+
+============================================================================
+                       model_name       aic    lag  stats    DV      IV     
+----------------------------------------------------------------------------
+indi-> positive     indi-> positive   -256.451  0           indi  positive  
+coll-> positive     coll-> positive   -259.868  0           coll  positive  
+indi-> negative     indi-> negative   -222.955  0   19.437  indi  negative  
+coll-> negative     coll-> negative   -221.306  0   -2.245  coll  negative  
+indi-> competent    indi-> competent  -236.909  0   0.246   indi  competent 
+coll-> competent    coll-> competent  -236.497  0   0.183   coll  competent 
+indi-> warm           indi-> warm     -232.375  0   -0.380  indi    warm    
+coll-> warm           coll-> warm     -234.144  0   -0.819  coll    warm    
+indi-> incompetent indi-> incompetent -214.720  0   8.973   indi incompetent
+coll-> incompetent coll-> incompetent -215.666  0  -147.599 coll incompetent
+indi-> unwarm        indi-> unwarm    -236.644  0   54.777  indi   unwarm   
+coll-> unwarm        coll-> unwarm    -227.745  0           coll   unwarm   
+indi-> virtue        indi-> virtue    -265.727  0   15.235  indi   virtue   
+coll-> virtue        coll-> virtue    -267.184  0  153.738  coll   virtue   
+indi-> vice           indi-> vice     -237.694  0   0.012   indi    vice    
+coll-> vice           coll-> vice     -218.227  0           coll    vice    
+----------------------------------------------------------------------------
