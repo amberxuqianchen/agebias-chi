@@ -5,6 +5,15 @@ setwd("/home/local/PSYCH-ADS/xuqian_chen/Github/agebias-chi")
 datafolder <- "./2_pipeline/out"
 outputfolder <- "./3_output/figures"
 outputresult <- "./3_output/results/bcp"
+if (!dir.exists(outputfolder)) {
+  dir.create(outputfolder)
+}
+
+if (!dir.exists(outputresult)) {
+  dir.create(outputresult)
+}
+
+
 library("bcp")
 library("ggplot2")
 library("dplyr")
