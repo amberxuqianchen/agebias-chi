@@ -1,0 +1,15 @@
+"IV","DV","best_lag","p_value"
+"indi","negative",1,0.078
+"negative","indi",1,0.67
+"coll","negative",1,0.152
+"negative","coll",1,0.06
+"loose","negative",1,0.947
+"negative","loose",1,0.711
+"indi","warm",3,0.347
+"warm","indi",3,0.279
+"coll","warm",2,0.846
+"warm","coll",2,0.19
+"tight","warm",1,0.321
+"warm","tight",1,0.024
+"loose","warm",1,0.013
+"warm","loose",1,0.547

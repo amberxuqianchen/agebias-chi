@@ -1,5 +1,5 @@
 # This script compares the results of ARIMA under automatically running 10 years' lag and auto.arima to pick the lowest AIC.
-
+# source: https://towardsdatascience.com/a-quick-introduction-on-granger-causality-testing-for-time-series-analysis-7113dc9420d2
 setwd("/home/local/PSYCH-ADS/xuqian_chen/Github/agebias-chi")
 datafolder <- "./2_pipeline/out"
 arimafolder <- "./3_output/results/arima"
@@ -38,9 +38,9 @@ dfage$tightloose <- dfage$tight - dfage$loose
 dfage$gdp_per_capita_log <- log(dfage$GDP.per.capita)
 
 # loop through dependent variables to run ARIMA, granger causality, and plot
-dvs <- c("positive","negative","competent","warm","incompetent","unwarm","virtue","vice")
+# dvs <- c("positive","negative","competent","warm","incompetent","unwarm","virtue","vice")
 ivs <- c("indi","coll", "tight","loose")
-# dvs <- c("positive","competent","warm","virtue","vice")
+dvs <- c("positive","competent","warm","virtue")
 # ivs <- c("indi","coll")
 ########
 # Notes#
@@ -72,10 +72,10 @@ model_list_GDP <- list()
 model_list <- list()
 model_names <- c()
 model_GDP_names <- c()
-for (i in 1:length(dvs)){
-    for (j in 1:length(ivs)){
-      x_ts <- ts(dfage[,ivs[j]])
-      y_ts <- ts(dfage[,dvs[i]])
+for (j in 1:length(dvs)){
+    for (i in 1:length(ivs)){
+      x_ts <- ts(dfage[,ivs[i]])
+      y_ts <- ts(dfage[,dvs[j]])
       gdp_ts <- ts(dfage$gdp_per_capita_log)
       # run ARIMA with GDPpc as controlling variable
       xreg <- cbind(gdp_ts,x_ts)
@@ -87,11 +87,11 @@ for (i in 1:length(dvs)){
 
       # lable the ivnames 
       names(model$coef)[names(model$coef) == "gdp_ts"] <- "GDP per capita"
-      names(model$coef)[names(model$coef) == "x_ts"] <- ivs[j]
+      names(model$coef)[names(model$coef) == "x_ts"] <- ivs[i]
       # save the model
-      model_name <- paste(dvs[i], " (", ar, ",", diff, ",", ma, ")", sep="")
+      model_name <- paste(dvs[j], " (", ar, ",", diff, ",", ma, ")", sep="")
       model_GDP_names <- c(model_GDP_names,model_name)
-      model_list_GDP[[paste(dvs[i],"~",ivs[j])]] <- model
+      model_list_GDP[[paste(dvs[j],"~",ivs[i])]] <- model
       
       # run ARIMA without GDPpc as controlling variable
       xreg <- cbind(x_ts)
@@ -102,57 +102,66 @@ for (i in 1:length(dvs)){
       model <- arima(y_ts,order = c(ar,diff,ma),xreg = xreg)
 
       # lable the ivnames 
-      names(model$coef)[names(model$coef) == "xreg"] <- ivs[j]
+      names(model$coef)[names(model$coef) == "xreg"] <- ivs[i]
 
       # save the model
-      model_name <- paste(dvs[i], " (", ar, ",", diff, ",", ma, ")", sep="")
+      model_name <- paste(dvs[j], " (", ar, ",", diff, ",", ma, ")", sep="")
       model_names <- c(model_names,model_name)
-      model_list[[paste(dvs[i],"~",ivs[j])]] <- model
+      model_list[[paste(dvs[j],"~",ivs[i])]] <- model
       # there are aliased (perfectly correlated or duplicate) coefficients between indi and negative
      
       x_fit <- auto.arima(x_ts)
       y_fit <- auto.arima(y_ts)
+      # fit <- auto.arima(dfage[,dvs[i]],xreg = dfage[,ivs[j]])
+      # ar <- fit$arma[1]
       bestlag <- ar
-      try({
-        # granger_model <- grangertest(dfage[,dvs[j]]~dfage[,ivs[i]],order = bestlag)
-        granger_model <- grangertest(y_ts~x_ts,order = bestlag)
-        granger_results <- rbind(granger_results, 
-                        data.frame(IV = ivs[j], 
-                                    DV = dvs[i], 
-                                    best_lag = bestlag, 
-                                    # best_lag = optimal_lag, 
-                                    p_value = round(granger_model$`Pr(>F)`[2],digits = 3)
-                              )
-                  )
-      }, silent=TRUE)
-      try({
-        # granger_model <- grangertest(dfage[,ivs[i]]~dfage[,dvs[j]],order = bestlag)
-        granger_model <- grangertest(x_ts~y_ts,order = bestlag)
-        granger_results <- rbind(granger_results, 
-                        data.frame(IV = dvs[i], 
-                                    DV = ivs[j], 
-                                    best_lag = bestlag, 
-                                    # best_lag = optimal_lag, 
-                                    p_value = round(granger_model$`Pr(>F)`[2],digits = 3)
-                                    )
-                  )
-      }, silent=TRUE)
+
+      # try({
+      #   # granger_model <- grangertest(dfage[,dvs[j]]~dfage[,ivs[i]],order = bestlag)
+      #   granger_model <- grangertest(y_ts~x_ts,order = bestlag)
+      #   granger_results <- rbind(granger_results, 
+      #                   data.frame(IV = ivs[i], 
+      #                               DV = dvs[j], 
+      #                               best_lag = bestlag, 
+      #                               # best_lag = optimal_lag, 
+      #                               p_value = round(granger_model$`Pr(>F)`[2],digits = 3)
+      #                         )
+      #             )
+      # }, silent=TRUE)
+      # try({
+      #   # granger_model <- grangertest(dfage[,ivs[i]]~dfage[,dvs[j]],order = bestlag)
+      #   granger_model <- grangertest(x_ts~y_ts,order = bestlag)
+      #   granger_results <- rbind(granger_results, 
+      #                   data.frame(IV = dvs[j], 
+      #                               DV = ivs[i], 
+      #                               best_lag = bestlag, 
+      #                               # best_lag = optimal_lag, 
+      #                               p_value = round(granger_model$`Pr(>F)`[2],digits = 3)
+      #                               )
+      #             )
+      # }, silent=TRUE)
       
       ## var way of granger
 
       # # Combine your series into a data frame, this will be the input to the VAR function
-      # diff_x_order <- x_fit$arma[6]
-      # diff_y_order <- y_fit$arma[6]
-      # diff_x <- diff(x_ts,differences = diff_x_order)
-      # diff_y <- diff(y_ts,differences = diff_y_order)
-      # df <- data.frame(y = diff_y,x = diff_x)
-      # # Mean imputation
-      # df$x <- ifelse(is.na(df$x), mean(df$x, na.rm = TRUE), df$x)
-      # df$y <- ifelse(is.na(df$y), mean(df$y, na.rm = TRUE), df$y)
+      diff_x_order <- x_fit$arma[6]
+      diff_y_order <- y_fit$arma[6]
+      # differencing order of x and y should be the same because it will influence the length of x and y after differencing
+      diff_order <- max(diff_x_order,diff_y_order)
+      if(diff_order == 0) {
+        diff_x <- x_ts
+        diff_y <- y_ts
+      } else {
+        diff_x <- diff(x_ts,differences = diff_order)
+        diff_y <- diff(y_ts,differences = diff_order)
+      }
+      df <- data.frame(y = diff_y,x = diff_x)
+      # Remove rows with NA values
+      df <- df[complete.cases(df), ]
 
       # Fit a VAR model
-      # # #1 The argument 'ic' specifies the information criterion to use for selecting the lag length
-      # # In this case, we're using the Akaike information criterion (AIC)
+      # #1 The argument 'ic' specifies the information criterion to use for selecting the lag length
+      # In this case, we're using the Akaike information criterion (AIC)
       # var_model <- VAR(df, ic = "AIC")
       # # Perform Granger causality test using the estimated VAR model
       # granger_test <- causality(var_model, cause = "x")
@@ -161,22 +170,32 @@ for (i in 1:length(dvs)){
       # p_value <- granger_test$Granger$p.value
       # optimal_lag <- var_model$p
 
-      # # #2: Determine the best order for the VAR model
-      # var_result <- VARselect(df, lag.max = 10, type = "both")
-      # # Access the optimal lag according to AIC
-      # optimal_lag <- var_result$selection["AIC(n)"]
-      # granger_model <- grangertest(dfage[,dvs[i]]~dfage[,ivs[j]],order = optimal_lag)
-      # p_value <- granger_model$`Pr(>F)`[2]
-      # # append to granger_results
-      # granger_results <- rbind(granger_results, 
-      #                         data.frame(IV = ivs[j], 
-      #                                     DV = dvs[i], 
-      #                                     # best_lag = bestlag, 
-      #                                     best_lag = optimal_lag, 
-      #                                     p_value = round(p_value,digits = 3)
-      #                              )
-      #                   )
-      
+      # #2: Determine the best order for the VAR model
+      var_result <- VARselect(df, lag.max = 10, type = "both")
+      # Access the optimal lag according to AIC
+      optimal_lag <- var_result$selection["AIC(n)"]
+      granger_model <- grangertest(diff_y~diff_x,order = optimal_lag)
+      p_value <- granger_model$`Pr(>F)`[2]
+      # append to granger_results
+      granger_results <- rbind(granger_results, 
+                              data.frame(IV = paste(ivs[i],"(diff)"), 
+                                          DV = paste(dvs[j],"(diff)"), 
+                                          # best_lag = bestlag, 
+                                          best_lag = optimal_lag, 
+                                          p_value = round(p_value,digits = 3)
+                                   )
+                        )
+      granger_model <- grangertest(diff_x~diff_y,order = optimal_lag)
+      p_value <- granger_model$`Pr(>F)`[2]
+      # append to granger_results
+      granger_results <- rbind(granger_results, 
+                              data.frame(IV = paste(dvs[j],"(diff)"), 
+                                          DV = paste(ivs[i],"(diff)"), 
+                                          # best_lag = bestlag, 
+                                          best_lag = optimal_lag, 
+                                          p_value = round(p_value,digits = 3)
+                                   )
+                        )
       # bestlag_r <- select_lags(dfage[,ivs[j]],dfage[,dvs[i]])
       # granger_model <- grangertest(dfage[,dvs[i]],dfage[,ivs[j]],order = bestlag)
       # granger_list[[paste(ivs[j],dvs[i],sep = "<-")]] <- round(granger_model$`Pr(>F)`[2],digits = 2)
@@ -186,8 +205,8 @@ for (i in 1:length(dvs)){
   }
 }
 # after the loops, save the results to a .csv file
-write.csv(granger_results, file = file.path(grangerfolder, "ts_granger_results.csv"), row.names = FALSE)
+write.csv(granger_results, file = file.path(grangerfolder, "diff_granger_results_onlypos.csv"), row.names = FALSE)
 
 # save
-stargazer(model_list,summary = FALSE, type = "text", column.labels=model_names,star.cutoffs = c(.05, .01,.001), out = file.path(arimafolder,"arima_model.txt"))
-stargazer(model_list_GDP,summary = FALSE, type = "text",column.labels=model_GDP_names,star.cutoffs = c(.05, .01,.001), out = file.path(arimafolder,"arima_model_GDP.txt"))
+stargazer(model_list,summary = FALSE, type = "text", column.labels=model_names,star.cutoffs = c(.05, .01,.001), out = file.path(arimafolder,"arima_model_onlypos.txt"))
+stargazer(model_list_GDP,summary = FALSE, type = "text",column.labels=model_GDP_names,star.cutoffs = c(.05, .01,.001), out = file.path(arimafolder,"arima_model_logGDP_onlypos.txt"))
