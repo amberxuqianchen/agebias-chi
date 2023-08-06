@@ -30,4 +30,4 @@ merged_df = merged_df.sort_values('year')
 merged_df.reset_index(drop=True, inplace=True)
 
 # Write the merged dataframe to a new csv file
-merged_df.to_csv(os.path.join(out_folder_path, 'merged.csv'), index=False)
+merged_df.to_csv(os.path.join(out_folder_path, 'merged_shortmft.csv'), index=False)

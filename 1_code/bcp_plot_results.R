@@ -17,7 +17,7 @@ if (!dir.exists(outputresult)) {
 library("bcp")
 library("ggplot2")
 library("dplyr")
-datapath <- file.path(datafolder,"merged.csv")
+datapath <- file.path(datafolder,"merged_shortmft.csv")
 dfage <- read.csv(datapath)
 
 dfage$positive <- dfage$old_positive - dfage$young_positive
@@ -26,9 +26,11 @@ dfage$competent <- dfage$old_competent - dfage$young_competent
 dfage$warm <- dfage$old_warm - dfage$young_warm
 dfage$incompetent <- dfage$old_incompetent - dfage$young_incompetent
 dfage$cold <- dfage$old_unwarm - dfage$young_unwarm
-dfage$virtue <- dfage$old_virtue - dfage$young_virtue
-dfage$vice <- dfage$old_vice - dfage$young_vice
-
+# dfage$virtue <- dfage$old_virtue - dfage$young_virtue
+# dfage$vice <- dfage$old_vice - dfage$young_vice
+# short mft dict
+dfage$virtue <- dfage$oa_virtue - dfage$ya_virtue
+dfage$vice <- dfage$oa_vice - dfage$ya_vice
 set.seed(101)
 # ==============================
 # LOAD DATA
@@ -121,13 +123,13 @@ fit = bcp(dfage$virtue)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 virtue_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
-write.csv(virtue_year_prob,file.path(outputresult,"virtue_year_prob.csv"))
+write.csv(virtue_year_prob,file.path(outputresult,"virtue_year_prob_shortmft.csv"))
 # plot vice
 fit = bcp(dfage$vice)
 year_prob = cbind(dfage$year, fit$posterior.prob,fit$posterior.mean)
 colnames(year_prob) = c("Year", "Prob","Means")
 vice_year_prob = as.data.frame(year_prob) %>% arrange(desc(Prob))
-write.csv(vice_year_prob,file.path(outputresult,"vice_year_prob.csv"))
+write.csv(vice_year_prob,file.path(outputresult,"vice_year_prob_shortmft.csv"))
 # plot both virtue and vice
 ggplot()+
   geom_line(data = virtue_year_prob,aes(Year,Means,color = "Virtue"))+
@@ -137,4 +139,4 @@ ggplot()+
   labs(title = "Virtue and Vice (Old - Young)",x = "Year",y = "Posterior Means",color = "Moral Foundations",caption = "Annotations indicate the top 3 years with the highest posterior probability")
 
 # save plot
-ggsave(file.path(outputfolder,"bcp_moral.png"),width = 6,height = 4)
+ggsave(file.path(outputfolder,"bcp_moral_shortmft.png"),width = 6,height = 4)
