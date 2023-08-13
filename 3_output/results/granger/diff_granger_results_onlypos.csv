@@ -1,4 +1,12 @@
 "IV","DV","best_lag","p_value"
+"indi (diff)","virtue (diff)",10,0.503
+"virtue (diff)","indi (diff)",10,0.516
+"coll (diff)","virtue (diff)",1,0.644
+"virtue (diff)","coll (diff)",1,0.409
+"tight (diff)","virtue (diff)",6,0.973
+"virtue (diff)","tight (diff)",6,0.257
+"loose (diff)","virtue (diff)",10,0.711
+"virtue (diff)","loose (diff)",10,0.11
 "indi (diff)","positive (diff)",10,0.643
 "positive (diff)","indi (diff)",10,0.148
 "coll (diff)","positive (diff)",1,0.695
@@ -23,11 +31,3 @@
 "warm (diff)","tight (diff)",8,0.185
 "loose (diff)","warm (diff)",10,0.682
 "warm (diff)","loose (diff)",10,0.448
-"indi (diff)","virtue (diff)",10,0.503
-"virtue (diff)","indi (diff)",10,0.516
-"coll (diff)","virtue (diff)",1,0.644
-"virtue (diff)","coll (diff)",1,0.409
-"tight (diff)","virtue (diff)",6,0.973
-"virtue (diff)","tight (diff)",6,0.257
-"loose (diff)","virtue (diff)",10,0.711
-"virtue (diff)","loose (diff)",10,0.11

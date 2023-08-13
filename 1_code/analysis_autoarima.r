@@ -23,7 +23,8 @@ library(vars)
 
 datapath <- file.path(datafolder,"merged.csv")
 dfage <- read.csv(datapath)
-
+# only keep the year > 1977
+dfage <- dfage[dfage$year >= 1977,]
 dfage$positive <- dfage$old_positive - dfage$young_positive
 dfage$negative <- dfage$old_negative - dfage$young_negative
 dfage$competent <- dfage$old_competent - dfage$young_competent
@@ -40,7 +41,7 @@ dfage$gdp_per_capita_log <- log(dfage$GDP.per.capita)
 # loop through dependent variables to run ARIMA, granger causality, and plot
 # dvs <- c("positive","negative","competent","warm","incompetent","unwarm","virtue","vice")
 ivs <- c("indi","coll", "tight","loose")
-dvs <- c("positive","competent","warm","virtue")
+dvs <- c("virtue","positive","competent","warm")
 # ivs <- c("indi","coll")
 ########
 # Notes#
@@ -58,7 +59,6 @@ dvs <- c("positive","competent","warm","virtue")
 # ANOTHER WAY TO GET THE ORDER:
 # arimaorder(fit)
 
-
 # Create a data frame to store ARIMA and Granger test results
 granger_results <- data.frame(
   IV = character(), 
@@ -72,6 +72,25 @@ model_list_GDP <- list()
 model_list <- list()
 model_names <- c()
 model_GDP_names <- c()
+model_results <- data.frame(
+    
+    Predictor = character(),
+    Order_p_d_q = character(),
+    Coefficient = numeric(),
+    SE = numeric(),
+    t = numeric(),
+    p = numeric(),
+    stringsAsFactors = FALSE
+  )
+  model_GDP_results <- data.frame(
+    Predictor = character(),
+    Order_p_d_q = character(),
+    Coefficient = numeric(),
+    SE = numeric(),
+    t = numeric(),
+    p = numeric(),
+    stringsAsFactors = FALSE
+  )
 for (j in 1:length(dvs)){
     for (i in 1:length(ivs)){
       x_ts <- ts(dfage[,ivs[i]])
@@ -92,7 +111,20 @@ for (j in 1:length(dvs)){
       model_name <- paste(dvs[j], " (", ar, ",", diff, ",", ma, ")", sep="")
       model_GDP_names <- c(model_GDP_names,model_name)
       model_list_GDP[[paste(dvs[j],"~",ivs[i])]] <- model
-      
+      # Calculate standard error, z-values and p-values
+      standard_error <- sqrt(diag(vcov(model)))['x_ts']
+      z_value <- coef(model)[ivs[i]]/standard_error
+      p_value <- 2 * (1 - pnorm(abs(z_value)))
+      # append to model_results
+      model_GDP_results <- rbind(model_GDP_results, 
+                                data.frame(Predictor = ivs[i], 
+                                            Order_p_d_q = paste(ar, diff, ma, sep = ","), 
+                                            Coefficient = round(coef(model)[ivs[i]],3), 
+                                            SE = round(standard_error,3),
+                                            t = round(z_value,3),
+                                            p = round(p_value,3)
+                                            )
+                                )
       # run ARIMA without GDPpc as controlling variable
       xreg <- cbind(x_ts)
       fit <- auto.arima(y_ts,xreg = xreg)
@@ -109,7 +141,22 @@ for (j in 1:length(dvs)){
       model_names <- c(model_names,model_name)
       model_list[[paste(dvs[j],"~",ivs[i])]] <- model
       # there are aliased (perfectly correlated or duplicate) coefficients between indi and negative
-     
+
+    # Calculate standard error, z-values and p-values
+      standard_error <- sqrt(diag(vcov(model)))['xreg']
+      z_value <- coef(model)[ivs[i]]/standard_error
+      p_value <- 2 * (1 - pnorm(abs(z_value)))
+      # append to model_results
+      model_results <- rbind(model_results, 
+                                data.frame(Predictor = ivs[i], 
+                                            Order_p_d_q = paste(ar, diff, ma, sep = ","), 
+                                            Coefficient = round(coef(model)[ivs[i]],3), 
+                                            SE = round(standard_error,3),
+                                            t = round(z_value,3),
+                                            p = round(p_value,3)
+                                            )
+                                )
+
       x_fit <- auto.arima(x_ts)
       y_fit <- auto.arima(y_ts)
       # fit <- auto.arima(dfage[,dvs[i]],xreg = dfage[,ivs[j]])
@@ -205,8 +252,9 @@ for (j in 1:length(dvs)){
   }
 }
 # after the loops, save the results to a .csv file
-write.csv(granger_results, file = file.path(grangerfolder, "diff_granger_results_onlypos.csv"), row.names = FALSE)
-
+write.csv(granger_results, file = file.path(grangerfolder, "diff_granger_results_onlypos_1977.csv"), row.names = FALSE)
+write.csv(model_results, file = file.path(arimafolder, "arima_results_onlypos_1977.csv"), row.names = FALSE)
+write.csv(model_GDP_results, file = file.path(arimafolder, "arima_results_logGDP_onlypos_1977.csv"), row.names = FALSE)
 # save
-stargazer(model_list,summary = FALSE, type = "text", column.labels=model_names,star.cutoffs = c(.05, .01,.001), out = file.path(arimafolder,"arima_model_onlypos.txt"))
-stargazer(model_list_GDP,summary = FALSE, type = "text",column.labels=model_GDP_names,star.cutoffs = c(.05, .01,.001), out = file.path(arimafolder,"arima_model_logGDP_onlypos.txt"))
+stargazer(model_list,summary = FALSE, type = "text", column.labels=model_names,star.cutoffs = c(.05, .01,.001), out = file.path(arimafolder,"arima_model_onlypos_1977.txt"))
+stargazer(model_list_GDP,summary = FALSE, type = "text",column.labels=model_GDP_names,star.cutoffs = c(.05, .01,.001), out = file.path(arimafolder,"arima_model_logGDP_onlypos_1977.txt"))
