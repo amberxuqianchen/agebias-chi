@@ -24,7 +24,7 @@ library(vars)
 datapath <- file.path(datafolder,"merged.csv")
 dfage <- read.csv(datapath)
 # only keep the year > 1977
-dfage <- dfage[dfage$year >= 1977,]
+# dfage <- dfage[dfage$year >= 1977,]
 dfage$positive <- dfage$old_positive - dfage$young_positive
 dfage$negative <- dfage$old_negative - dfage$young_negative
 dfage$competent <- dfage$old_competent - dfage$young_competent
@@ -91,6 +91,16 @@ model_results <- data.frame(
     p = numeric(),
     stringsAsFactors = FALSE
   )
+granger_results <- data.frame(
+  IV = character(),
+  DV = character(),
+  best_lag = numeric(),
+  F_value = character(),
+  p_value = numeric(),
+  reverse_F_value = character(),
+  reverse_p_value = numeric(),
+  stringsAsFactors = FALSE
+)
 for (j in 1:length(dvs)){
     for (i in 1:length(ivs)){
       x_ts <- ts(dfage[,ivs[i]])
@@ -218,31 +228,57 @@ for (j in 1:length(dvs)){
       # optimal_lag <- var_model$p
 
       # #2: Determine the best order for the VAR model
-      var_result <- VARselect(df, lag.max = 10, type = "both")
-      # Access the optimal lag according to AIC
+      # var_result <- VARselect(df, lag.max = 10, type = "both")
+      # # Access the optimal lag according to AIC
+      # optimal_lag <- var_result$selection["AIC(n)"]
+      # granger_model <- grangertest(diff_y~diff_x,order = optimal_lag)
+      # p_value <- granger_model$`Pr(>F)`[2]
+      # # append to granger_results
+      # granger_results <- rbind(granger_results, 
+      #                         data.frame(IV = paste(ivs[i],"(diff)"), 
+      #                                     DV = paste(dvs[j],"(diff)"), 
+      #                                     # best_lag = bestlag, 
+      #                                     best_lag = optimal_lag, 
+      #                                     p_value = round(p_value,digits = 3)
+      #                              )
+      #                   )
+      # granger_model <- grangertest(diff_x~diff_y,order = optimal_lag)
+      # p_value <- granger_model$`Pr(>F)`[2]
+      # # append to granger_results
+      # granger_results <- rbind(granger_results, 
+      #                         data.frame(IV = paste(dvs[j],"(diff)"), 
+      #                                     DV = paste(ivs[i],"(diff)"), 
+      #                                     # best_lag = bestlag, 
+      #                                     best_lag = optimal_lag, 
+      #                                     p_value = round(p_value,digits = 3)
+      #                              )
+      #                   )
+      # #3: use VAR model and causality function to test granger causality
+      var_result <- VARselect(df, lag.max = 10,  type = "both")
       optimal_lag <- var_result$selection["AIC(n)"]
-      granger_model <- grangertest(diff_y~diff_x,order = optimal_lag)
-      p_value <- granger_model$`Pr(>F)`[2]
+
+      var_model <- VAR(df, p = optimal_lag)
+      granger_test <- causality(var_model, cause = "x")
+      p_value <- granger_test$Granger$p.value
+      f_value <- granger_test$Granger$statistic[[1]]
+      df1 <- granger_test$Granger$parameter[[1]]
+      df2 <- granger_test$Granger$parameter[[2]]
+      reverse_granger_test <- causality(var_model, cause = "y")
+      reverse_p_value <- reverse_granger_test$Granger$p.value
+      reverse_f_value <- reverse_granger_test$Granger$statistic[[1]]
+      reverse_df1 <- reverse_granger_test$Granger$parameter[[1]]
+      reverse_df2 <- reverse_granger_test$Granger$parameter[[2]]
       # append to granger_results
       granger_results <- rbind(granger_results, 
-                              data.frame(IV = paste(ivs[i],"(diff)"), 
-                                          DV = paste(dvs[j],"(diff)"), 
-                                          # best_lag = bestlag, 
+                              data.frame(IV = ivs[i], 
+                                          DV = dvs[j], 
                                           best_lag = optimal_lag, 
-                                          p_value = round(p_value,digits = 3)
-                                   )
-                        )
-      granger_model <- grangertest(diff_x~diff_y,order = optimal_lag)
-      p_value <- granger_model$`Pr(>F)`[2]
-      # append to granger_results
-      granger_results <- rbind(granger_results, 
-                              data.frame(IV = paste(dvs[j],"(diff)"), 
-                                          DV = paste(ivs[i],"(diff)"), 
-                                          # best_lag = bestlag, 
-                                          best_lag = optimal_lag, 
-                                          p_value = round(p_value,digits = 3)
-                                   )
-                        )
+                                          F_value = paste("F(",df1,", ",df2,") = ",round(f_value,2),sep = ""),
+                                          p_value = round(p_value,digits = 2),
+                                          reverse_F_value = paste("F(",reverse_df1,", ",reverse_df2,") = ",round(reverse_f_value,2),sep = ""),
+                                          reverse_p_value = round(reverse_p_value,digits = 2)
+                                          )
+                                )
       # bestlag_r <- select_lags(dfage[,ivs[j]],dfage[,dvs[i]])
       # granger_model <- grangertest(dfage[,dvs[i]],dfage[,ivs[j]],order = bestlag)
       # granger_list[[paste(ivs[j],dvs[i],sep = "<-")]] <- round(granger_model$`Pr(>F)`[2],digits = 2)
@@ -252,7 +288,7 @@ for (j in 1:length(dvs)){
   }
 }
 # after the loops, save the results to a .csv file
-write.csv(granger_results, file = file.path(grangerfolder, "diff_granger_results_onlypos_1977.csv"), row.names = FALSE)
+write.csv(granger_results, file = file.path(grangerfolder, "diff_granger_results_onlypos_causality.csv"), row.names = FALSE)
 write.csv(model_results, file = file.path(arimafolder, "arima_results_onlypos_1977.csv"), row.names = FALSE)
 write.csv(model_GDP_results, file = file.path(arimafolder, "arima_results_logGDP_onlypos_1977.csv"), row.names = FALSE)
 # save
