@@ -51,11 +51,12 @@ dfage$warm <- dfage$old_warm - dfage$young_warm
 dfage$virtue <- dfage$old_virtue - dfage$young_virtue
 dfage$gdp_per_capita_log <- log(dfage$GDP.per.capita)
 
-
+iv <- "loose"
+dv <- "virtue"
+data <- dfage
 
 # transform GPD per capita to log scale
 dfage$gdp_per_capita_log <- log(dfage$GDP.per.capita)
-
 
 perform_arima <- function(data, dv, iv,gdp_var = NULL) {
   x_ts <- ts(data[iv])
@@ -64,18 +65,26 @@ perform_arima <- function(data, dv, iv,gdp_var = NULL) {
   if (!is.null(gdp_var)) {
     gdp_ts <- ts(data[[gdp_var]])
     xreg <- cbind(gdp_ts, x_ts)
-
+    fit <- auto.arima(y_ts, xreg = xreg)
+    ar <- fit$arma[1]
+    ma <- fit$arma[2]
+    diff <- fit$arma[6]
+    model <- arima(y_ts, order = c(ar, diff, ma), xreg = xreg)
+    coef_val <- coef(model)['x_ts']
+    se_val <- sqrt(diag(vcov(model)))['x_ts']
 
   } else {
     xreg <- cbind(x_ts)
+    fit <- auto.arima(y_ts, xreg = xreg)
+    ar <- fit$arma[1]
+    ma <- fit$arma[2]
+    diff <- fit$arma[6]
+    model <- arima(y_ts, order = c(ar, diff, ma), xreg = xreg)
+    coef_val <- coef(model)[iv]
+    se_val <- sqrt(diag(vcov(model)))[iv]
+
   }
-  fit <- auto.arima(y_ts, xreg = xreg)
-  ar <- fit$arma[1]
-  ma <- fit$arma[2]
-  diff <- fit$arma[6]
-  model <- arima(y_ts, order = c(ar, diff, ma), xreg = xreg)
-  coef_val <- coef(model)['x_ts']
-  se_val <- sqrt(diag(vcov(model)))['x_ts']
+
   ci_low <- coef_val - 1.96 * se_val
   ci_high <- coef_val + 1.96 * se_val
   p_value <- 2 * (1 - pnorm(abs(coef_val/se_val)))
