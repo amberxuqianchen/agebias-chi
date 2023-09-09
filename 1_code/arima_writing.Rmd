@@ -1,0 +1,128 @@
+---
+title: "Result"
+shorttitle        : "Arima Result"
+author: 
+  - name          : ""
+    affiliation   : "1"
+authornote: |
+  Add complete correspondence information here.
+
+abstract: |
+  This is an abstract.
+
+keywords          : "keywords, go, here"
+wordcount         : "X"
+
+figsintext        : no
+fig_caption       : yes
+
+documentclass     : "apa7"
+classoption       : "man"
+output: 
+  papaja::apa6_docx:
+    latex_engine: "xelatex"
+---
+---
+
+## Arima
+```{r}
+mainpath <- "/home/local/PSYCH-ADS/xuqian_chen/Github/agebias-chi"
+datafolder <- file.path(mainpath, "2_pipeline/out")
+arimafolder <-  file.path(mainpath, "3_output/results/arima")
+grangerfolder <-  file.path(mainpath,"3_output/results/granger")
+library(forecast)
+library(tseries)
+# Granger test
+library(lmtest)
+library(zoo)
+library(stargazer)
+# VAR
+library(vars)
+# for writing
+library(papaja)
+datapath <- file.path(datafolder,"merged.csv")
+dfage <- read.csv(datapath)
+# only keep the year > 1977
+# dfage <- dfage[dfage$year >= 1977,]
+dfage$positive <- dfage$old_positive - dfage$young_positive
+
+dfage$competent <- dfage$old_competent - dfage$young_competent
+dfage$warm <- dfage$old_warm - dfage$young_warm
+dfage$virtue <- dfage$old_virtue - dfage$young_virtue
+dfage$gdp_per_capita_log <- log(dfage$GDP.per.capita)
+
+
+
+# transform GPD per capita to log scale
+dfage$gdp_per_capita_log <- log(dfage$GDP.per.capita)
+
+
+perform_arima <- function(data, dv, iv,gdp_var = NULL) {
+  x_ts <- ts(data[iv])
+  y_ts <- ts(data[dv])
+  
+  if (!is.null(gdp_var)) {
+    gdp_ts <- ts(data[[gdp_var]])
+    xreg <- cbind(gdp_ts, x_ts)
+
+
+  } else {
+    xreg <- cbind(x_ts)
+  }
+  fit <- auto.arima(y_ts, xreg = xreg)
+  ar <- fit$arma[1]
+  ma <- fit$arma[2]
+  diff <- fit$arma[6]
+  model <- arima(y_ts, order = c(ar, diff, ma), xreg = xreg)
+  coef_val <- coef(model)['x_ts']
+  se_val <- sqrt(diag(vcov(model)))['x_ts']
+  ci_low <- coef_val - 1.96 * se_val
+  ci_high <- coef_val + 1.96 * se_val
+  p_value <- 2 * (1 - pnorm(abs(coef_val/se_val)))
+  return(list(coef = coef_val, ci_low = ci_low, ci_high = ci_high, p_value = p_value))
+}
+
+ivs <- c("indi","coll", "tight","loose")
+dvs <- c("virtue","positive","competent","warm")
+virtueindi <- perform_arima(dfage, "virtue", "indi")
+virtuecoll <- perform_arima(dfage, "virtue", "coll")
+virtuetight <- perform_arima(dfage, "virtue", "tight")
+virtueloose <- perform_arima(dfage, "virtue", "loose")
+positiveindi <- perform_arima(dfage, "positive", "indi")
+positivecoll <- perform_arima(dfage, "positive", "coll")
+positivetight <- perform_arima(dfage, "positive", "tight")
+positiveloose <- perform_arima(dfage, "positive", "loose")
+competentindi <- perform_arima(dfage, "competent", "indi")
+competentcoll <- perform_arima(dfage, "competent", "coll")
+competenttight <- perform_arima(dfage, "competent", "tight")
+competentloose <- perform_arima(dfage, "competent", "loose")
+warwindi <- perform_arima(dfage, "warm", "indi")
+warmcoll <- perform_arima(dfage, "warm", "coll")
+warmtight <- perform_arima(dfage, "warm", "tight")
+warmloose <- perform_arima(dfage, "warm", "loose")
+
+virtueindi_GDP <- perform_arima(dfage, "virtue", "indi", "gdp_per_capita_log")
+virtuecoll_GDP <- perform_arima(dfage, "virtue", "coll", "gdp_per_capita_log")
+virtuetight_GDP <- perform_arima(dfage, "virtue", "tight", "gdp_per_capita_log")
+virtueloose_GDP <- perform_arima(dfage, "virtue", "loose", "gdp_per_capita_log")
+positiveindi_GDP <- perform_arima(dfage, "positive", "indi", "gdp_per_capita_log")
+positivecoll_GDP <- perform_arima(dfage, "positive", "coll", "gdp_per_capita_log")
+positivetight_GDP <- perform_arima(dfage, "positive", "tight", "gdp_per_capita_log")
+positiveloose_GDP <- perform_arima(dfage, "positive", "loose", "gdp_per_capita_log")
+competentindi_GDP <- perform_arima(dfage, "competent", "indi", "gdp_per_capita_log")
+competentcoll_GDP <- perform_arima(dfage, "competent", "coll", "gdp_per_capita_log")
+competenttight_GDP <- perform_arima(dfage, "competent", "tight", "gdp_per_capita_log")
+competentloose_GDP <- perform_arima(dfage, "competent", "loose", "gdp_per_capita_log")
+warwindi_GDP <- perform_arima(dfage, "warm", "indi", "gdp_per_capita_log")
+warmcoll_GDP <- perform_arima(dfage, "warm", "coll", "gdp_per_capita_log")
+warmtight_GDP <- perform_arima(dfage, "warm", "tight", "gdp_per_capita_log")
+warmloose_GDP <- perform_arima(dfage, "warm", "loose", "gdp_per_capita_log")
+
+```
+Firstly, in the assessment of Virtue Bias, Cultural Looseness had a significantly positive correlation with Virtue Bias, irrespective of whether GDP per capita was controlled for (without GDP: B = `r sprintf("%.2f", virtueloose$coef)`, 95% CI [`r sprintf("%.2f", virtueloose$ci_low)`, `r sprintf("%.2f", virtueloose$ci_high)`], *p* = `r ifelse(virtueloose$p_value < 0.001, "< 0.001", sprintf("%.3f", virtueloose$p_value))`; with GDP: B = `r sprintf("%.2f", virtueloose_GDP$coef)`, 95% CI [`r sprintf("%.2f", virtueloose_GDP$ci_low)`, `r sprintf("%.2f", virtueloose_GDP$ci_high)`], *p* = `r ifelse(virtueloose_GDP$p_value < 0.001, "< 0.001", sprintf("%.3f", virtueloose_GDP$p_value))`). Conversely, Cultural Tightness exhibited a strongly positive correlation with Virtue Bias when GDP per capita was considered (B = `r sprintf("%.2f", virtuetight_GDP$coef)`, 95% CI [`r sprintf("%.2f", virtuetight_GDP$ci_low)`, `r sprintf("%.2f", virtuetight_GDP$ci_high)`], *p* = `r ifelse(virtuetight_GDP$p_value < 0.001, "< 0.001", sprintf("%.3f", virtuetight_GDP$p_value))`) or not (B = `r sprintf("%.2f", virtuetight$coef)`, 95% CI [`r sprintf("%.2f", virtuetight$ci_low)`, `r sprintf("%.2f", virtuetight$ci_high)`], *p* = `r ifelse(virtuetight$p_value < 0.001, "< 0.001", sprintf("%.3f", virtuetight$p_value))`).
+
+For models evaluating Positivivity Bias, a significantly positive relationship was found between Positivity Bias and Collectivistic Values (B = `r sprintf("%.2f", positivecoll$coef)`, 95% CI [`r sprintf("%.2f", positivecoll$ci_low)`, `r sprintf("%.2f", positivecoll$ci_high)`], *p* = `r ifelse(positivecoll$p_value < 0.001, "< 0.001", sprintf("%.3f", positivecoll$p_value))`) but the significance diminished when GDP per capita was controlled for (B = `r sprintf("%.2f", positivecoll_GDP$coef)`, 95% CI [`r sprintf("%.2f", positivecoll_GDP$ci_low)`, `r sprintf("%.2f", positivecoll_GDP$ci_high)`], *p* = `r ifelse(positivecoll_GDP$p_value < 0.001, "< 0.001", sprintf("%.3f", positivecoll_GDP$p_value))`). Cultural Tightness showed strong positive correlation with Positivity Bias before (B = `r sprintf("%.2f", positivetight$coef)`, 95% CI [`r sprintf("%.2f", positivetight$ci_low)`, `r sprintf("%.2f", positivetight$ci_high)`], *p* = `r ifelse(positivetight$p_value < 0.001, "< 0.001", sprintf("%.3f", positivetight$p_value))`) and after controlling for GDP per capita (B = `r sprintf("%.2f", positivetight_GDP$coef)`, 95% CI [`r sprintf("%.2f", positivetight_GDP$ci_low)`, `r sprintf("%.2f", positivetight_GDP$ci_high)`], *p* = `r ifelse(positivetight_GDP$p_value < 0.001, "< 0.001", sprintf("%.3f", positivetight_GDP$p_value))`).
+
+Considering Competence Bias, none of the cultural values of Individualistic Values, Collectivistic Values, Cultural Tightness, or Cultural Looseness, displayed a significant association with Competence Bias.
+
+Focusing on Warmth Bias, both Collectivist Values and Cultural Tightness were positively correlated with Warmth Bias towards older adults before (Collectivistic: B = `r sprintf("%.2f", warmcoll$coef)`, 95% CI [`r sprintf("%.2f", warmcoll$ci_low)`, `r sprintf("%.2f", warmcoll$ci_high)`], *p* = `r ifelse(warmcoll$p_value < 0.001, "< 0.001", sprintf("%.3f", warmcoll$p_value))`; Tightness: B = `r sprintf("%.2f", warmtight$coef)`, 95% CI [`r sprintf("%.2f", warmtight$ci_low)`, `r sprintf("%.2f", warmtight$ci_high)`], *p* = `r ifelse(warmtight$p_value < 0.001, "< 0.001", sprintf("%.3f", warmtight$p_value))`) or after controlling for the influence of GDP per capita (Collectivistic: B = `r sprintf("%.2f", warmcoll_GDP$coef)`, 95% CI [`r sprintf("%.2f", warmcoll_GDP$ci_low)`, `r sprintf("%.2f", warmcoll_GDP$ci_high)`], *p* = `r ifelse(warmcoll_GDP$p_value < 0.001, "< 0.001", sprintf("%.3f", warmcoll_GDP$p_value))`; Tightness: B = `r sprintf("%.2f", warmtight_GDP$coef)`, 95% CI [`r sprintf("%.2f", warmtight_GDP$ci_low)`, `r sprintf("%.2f", warmtight_GDP$ci_high)`], *p* = `r ifelse(warmtight_GDP$p_value < 0.001, "< 0.001", sprintf("%.3f", warmtight_GDP$p_value))`). Cultural Looseness showed significant positive relationships with Warmth Bias only after controlling for GDP per capita (B = `r sprintf("%.2f", warmloose_GDP$coef)`, 95% CI [`r sprintf("%.2f", warmloose_GDP$ci_low)`, `r sprintf("%.2f", warmloose_GDP$ci_high)`], *p* = `r ifelse(warmloose_GDP$p_value < 0.001, "< 0.001", sprintf("%.3f", warmloose_GDP$p_value))`).
