@@ -42,18 +42,12 @@ library(vars)
 library(papaja)
 datapath <- file.path(datafolder,"merged.csv")
 dfage <- read.csv(datapath)
-# only keep the year > 1977
-# dfage <- dfage[dfage$year >= 1977,]
-dfage$positive <- dfage$old_positive - dfage$young_positive
 
+dfage$positive <- dfage$old_positive - dfage$young_positive
 dfage$competent <- dfage$old_competent - dfage$young_competent
 dfage$warm <- dfage$old_warm - dfage$young_warm
 dfage$virtue <- dfage$old_virtue - dfage$young_virtue
 dfage$gdp_per_capita_log <- log(dfage$GDP.per.capita)
-
-iv <- "loose"
-dv <- "virtue"
-data <- dfage
 
 # transform GPD per capita to log scale
 dfage$gdp_per_capita_log <- log(dfage$GDP.per.capita)
