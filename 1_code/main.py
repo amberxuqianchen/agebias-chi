@@ -29,6 +29,7 @@ models = load_word2vec_models(model_folder_path)
 
 # Change or add foundations to the dictionary here as needed
 # For example:
+# foundations = {'new_foundation_name': ['word1', 'word2', 'word3']}
 # foundations['new_foundation_name'] = ['word1', 'word2', 'word3']
 
 evaluations = {'foundations': foundations,  'scm': scm,'posneg': posneg}
@@ -42,6 +43,7 @@ for name, evaluations in evaluations.items():
     # Save the DataFrame as a CSV
     csv_filepath = os.path.join(pipeline_folder_path, name+ '.csv')
     dfbias.to_csv(csv_filepath, index=False)
+    print(f"Saved {name} to {csv_filepath}")
 
 # Plot the results
 # eventyear = 1978
