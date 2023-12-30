@@ -46,7 +46,7 @@ def sen2token(sentence):
             clear_tokens.append(token)
     return clear_tokens
 
-def list_sen2token(text):
+def list_sen2token(text,year):
     sentences = split_into_sentences(text)
     alltokens = [sen2token(sentence) for sentence in sentences]
     # save cleaned sentences to pickle file
@@ -81,22 +81,26 @@ def train_word2vec(tokenized_data, model_path):
     return model
 
 def main(year):
-    
+    year = str(year)
     # Load txt data
-    with open(rawtext_path+'renmin+year+'.txt', 'r') as f:
+    with open(rawtext_path+'renmin'+year+'.txt', 'r') as f:
         data = f.readlines()
 
     # Join the data into a single string
     text = ''.join(data)
 
     # Process the text
-    tokenized_data = list_sen2token(text)
+    tokenized_data = list_sen2token(text,year)
 
     # Train the model
     model = train_word2vec(tokenized_data, model_folder_path+'pd_'+year+'.model')
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Train Word2Vec model for Chinese text.')
     parser.add_argument('year', type=int, help='The year for which the model is being trained.')
     args = parser.parse_args()
     main(args.year)
+
+    # for year in range(1998,2018):
+    #     main(year)
